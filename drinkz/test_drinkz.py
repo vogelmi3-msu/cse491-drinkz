@@ -48,21 +48,36 @@ def test_get_liquor_amount_1():
     db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
     db.add_to_inventory('Johnnie Walker', 'Black Label', '1000 ml')
     amount = db.get_liquor_amount('Johnnie Walker', 'Black Label')
-    assert amount == '1000 ml', amount
+    assert amount == 1000.0, amount
+
+def test_get_liquor_amount_2():
+    db._reset_db()
+
+    db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
+    db.add_to_inventory('Johnnie Walker', 'Black Label', '1000 ml')
+    db.add_to_inventory('Johnnie Walker', 'Black Label', '100 oz')
+    amount = db.get_liquor_amount('Johnnie Walker', 'Black Label')
+    assert amount == 3957.35, amount
+
+def test_get_liquor_amount_4():
+    db._reset_db()
+
+    db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
+    db.add_to_inventory('Johnnie Walker', 'Black Label', '25 oz')
+    amount = db.get_liquor_amount('Johnnie Walker', 'Black Label')
+    assert amount == 739.3375, amount
 
 def test_bulk_load_inventory_1():
     db._reset_db()
 
     db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
-    
     data = "Johnnie Walker,Black Label,1000 ml"
     fp = StringIO(data)                 # make this look like a file handle
     n = load_bulk_data.load_inventory(fp)
 
     assert db.check_inventory('Johnnie Walker', 'Black Label')
-    assert n == 1, n
 
-def test_get_liquor_amount_2():
+def test_get_liquor_amount_3():
     db._reset_db()
 
     db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
@@ -72,7 +87,8 @@ def test_get_liquor_amount_2():
     n = load_bulk_data.load_inventory(fp)
 
     amount = db.get_liquor_amount('Johnnie Walker', 'Black Label')
-    assert amount == '1000 ml', amount
+    assert amount == 1000, amount    
+    assert n == 1, n
 
 def test_bulk_load_bottle_types_1():
     db._reset_db()
@@ -84,12 +100,12 @@ def test_bulk_load_bottle_types_1():
     assert db._check_bottle_type_exists('Johnnie Walker', 'Black Label')
     assert n == 1, n
 
-def test_script_load_bottle_types_2():
+def test_script_load_bottle_types_1():
     scriptpath = 'bin/load-liquor-types'
     module = imp.load_source('llt', scriptpath)
-    exit_code = module.main([scriptpath, 'test-data/bottle-types-data-3.txt'])
+    exit_code = module.main([scriptpath, 'test-data/bottle-types-data-1.txt'])
     assert exit_code == 0, 'non zero exit code %s' % exit_code
-    
+
     
 def test_get_liquor_inventory():
     db._reset_db()
