@@ -1,0 +1,9 @@
+#bottle types
+Johnnie Walker,Black Label,blended scotch
+Jose Cuervo,Silver,tequila
+
+#inventory
+Jose Cuervo,Silver,100ml
+Johnnie Walker,Black Label, 1000ml
+Johnnie Walker,Black Label, 400ml
+Johnnie Walker,Black Label, 200ml

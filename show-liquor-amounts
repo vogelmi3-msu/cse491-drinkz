@@ -1,0 +1,30 @@
+import drinkz.db
+
+drinkz.db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
+drinkz.db.add_bottle_type('Jose Cuervo', 'Red Label', 'good tequila')
+
+#Adding different amounts of Johnnie Walker
+drinkz.db.add_to_inventory('Johnnie Walker', 'Black Label', '1000 ml')
+drinkz.db.add_to_inventory('Johnnie Walker', 'Black Label', '200 ml')
+drinkz.db.add_to_inventory('Johnnie Walker', 'Black Label', '400 ml')
+
+#Adding different amounts of Jose Cuervo
+drinkz.db.add_to_inventory('Jose Cuervo', 'Red Label', '50 oz')
+drinkz.db.add_to_inventory('Jose Cuervo', 'Red Label', '300 ml')
+
+unique_list = set()
+print 'Manufacturer  \tLiquor        \tAmount (ml) '
+print '--------------\t--------------\t-----------'
+for mfg, liquor in drinkz.db.get_liquor_inventory():
+
+    if (mfg, liquor) in unique_list: #if is not unique skip
+       continue
+
+    #add new mfg and liquor to the unique list
+    unique_list.add((mfg,liquor))
+
+    #calculate amount
+    amount = drinkz.db.get_liquor_amount(mfg,liquor)
+
+    #print the result
+    print '%s\t%s\t%s' % (mfg, liquor,amount)
