@@ -1,0 +1,10 @@
+# this file has, at the end, a blank line, which should be handled
+# (ignored!) by our loading script - just like theses comments.
+
+
+
+# a simple example of a "good" data file.
+Johnnie Walker,Black Label,blended scotch
+
+
+Jose Cuervo, Silver, bad tequila
