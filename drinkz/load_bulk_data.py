@@ -15,13 +15,17 @@ from . import db                        # import from local package
 def data_reader(fp):
     reader = csv.reader(fp)
     for line in reader:
-        if line[0].startswith('#'):
-            continue
-        
-        if not line[0].strip():
+        try:
+            if line[0].startswith('#'):
+                continue
+
+            if not line[0].strip():
+                continue
+        except IndexError:
             continue
         (mfg, name, val3)= line
         yield mfg, name, val3
+        
 
 def load_bottle_types(fp):
     """
@@ -39,6 +43,8 @@ def load_bottle_types(fp):
     while (1):
         try:
             for mfg, name, typ in new_reader:
+                if typ.endswith('ml') or typ.endswith('oz'):
+                    continue
                 n += 1
                 db.add_bottle_type(mfg, name, typ)
             new_reader.next()
@@ -69,8 +75,9 @@ def load_inventory(fp):
     while (1):
         try:
             for mfg, liquor, amount in new_reader:
-                n += 1
-                db.add_to_inventory(mfg, liquor, amount)
+                if amount.endswith('ml') or amount.endswith('oz'):
+                    n += 1
+                    db.add_to_inventory(mfg, liquor, amount)
             new_reader.next()
         except StopIteration:
             return n
