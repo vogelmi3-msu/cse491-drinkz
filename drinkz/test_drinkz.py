@@ -18,6 +18,7 @@ def test_foo():
     # this test always passes; it's just to show you how it's done!
     print 'Note that output from passing tests is hidden'
 
+
 def test_add_bottle_type_1():
     print 'Note that output from failing tests is printed out!'
     
@@ -219,6 +220,17 @@ def test_script_load_bottle_types_5():
     module = imp.load_source('llt', scriptpath)
     exit_code = module.main([scriptpath, 'test-data/bottle-types-data-5.txt'])
     assert exit_code == 0, 'non zero exit code %s' % exit_code
+
+def test_script_load_bottle_types_6():
+    try:
+        scriptpath = 'bin/load-liquor-types'
+        module = imp.load_source('llt', scriptpath)
+        exit_code = module.main([scriptpath, 'test-data/bottle-types-data-6.txt'])          
+        assert exit_code == 0, 'non zero exit code %s' % exit_code
+    except db.InvalidInput:
+        pass
+        
+
         
 def test_get_liquor_inventory():
     db._reset_db()
@@ -231,9 +243,9 @@ def test_get_liquor_inventory():
 
     assert x == [('Johnnie Walker', 'Black Label')], x
 
+def test_set():    
+    db._reset_db()
 
-
-    
-
-
-
+    db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
+    db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
+    assert db._check_bottle_type_exists('Johnnie Walker', 'Black Label')

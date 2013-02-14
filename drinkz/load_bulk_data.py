@@ -23,7 +23,11 @@ def data_reader(fp):
                 continue
         except IndexError:
             continue
-        (mfg, name, val3)= line
+        try:
+            (mfg, name, val3)= line
+        except ValueError:
+            err = "Invalid input: missing amount"
+            raise db.InvalidInput(err)
         yield mfg, name, val3
         
 
