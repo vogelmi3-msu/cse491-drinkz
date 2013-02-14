@@ -47,8 +47,6 @@ def load_bottle_types(fp):
     while (1):
         try:
             for mfg, name, typ in new_reader:
-                if typ.endswith('ml') or typ.endswith('oz'):
-                    continue
                 n += 1
                 db.add_bottle_type(mfg, name, typ)
             new_reader.next()
@@ -79,9 +77,8 @@ def load_inventory(fp):
     while (1):
         try:
             for mfg, liquor, amount in new_reader:
-                if amount.endswith('ml') or amount.endswith('oz'):
-                    n += 1
-                    db.add_to_inventory(mfg, liquor, amount)
+                n += 1
+                db.add_to_inventory(mfg, liquor, amount)
             new_reader.next()
         except StopIteration:
             return n

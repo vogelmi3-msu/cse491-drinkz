@@ -34,8 +34,7 @@ def add_to_inventory(mfg, liquor, amount):
     "Add the given liquor/amount to inventory."
     if not _check_bottle_type_exists(mfg, liquor):
         err = "Missing liquor: manufacturer '%s', name '%s'" % (mfg, liquor)
-        raise LiquorMissing(err)
-    
+        raise LiquorMissing(err)    
         pass
 
     # check for key in dict, if  present, append list
@@ -62,13 +61,18 @@ def check_inventory(mfg, liquor):
 
 def get_liquor_amount(mfg, liquor):
     "Retrieve the total amount of any given liquor currently in inventory."
-    amounts = _inventory_db[(mfg, liquor)]
+    print _inventory_db.keys()
+#for key in _inventory_db:
+    #    print (key, _inventory_db[key],)
+    amounts = _inventory_db[(mfg, liquor)] 
     totalVolume = 0.0
 
     for bottle in amounts:
         amt = bottle.split()
         if amt[1] == "oz":
             totalVolume += float(amt[0]) * 29.5735
+        elif amt[1] == "gallon":
+            totalVolume +=float(amt[0]) * 3785.41
         else:
             totalVolume += float(amt[0])
             
