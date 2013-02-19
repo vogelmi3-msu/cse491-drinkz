@@ -2,15 +2,18 @@
 Database functionality for drinkz information.
 """
 
+
 # private singleton variables at module level
 _bottle_types_db =set()
-_inventory_db =[]
+_inventory_db ={}
+_recipe_db = {}
 
 def _reset_db():
     "A method only to be used during testing -- toss the existing db info."
     global _bottle_types_db, _inventory_db
     _bottle_types_db =set()
     _inventory_db = {}
+    _recipe_db = {}
 
 # exceptions in Python inherit from Exception and generally don't need to
 # override any methods.
@@ -82,3 +85,17 @@ def get_liquor_inventory():
     "Retrieve all liquor types in inventory, in tuple form: (mfg, liquor)."
     for key in _inventory_db:
         yield key[0], key[1]
+
+def add_recipe(r):
+    key = r.getName()
+    value = r.getIngredients()
+    _recipe_db[key] = value
+
+def get_recipe(name):
+    return _recipe_db[name]
+    
+
+def get_all_recipes():
+    pass
+
+

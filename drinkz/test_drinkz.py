@@ -230,7 +230,6 @@ def test_script_load_bottle_types_6():
     except db.InvalidInput:
         pass
         
-
         
 def test_get_liquor_inventory():
     db._reset_db()
