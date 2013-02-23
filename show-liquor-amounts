@@ -28,3 +28,5 @@ for mfg, liquor in drinkz.db.get_liquor_inventory():
 
     #print the result
     print '%s\t%s\t%s' % (mfg, liquor,amount)
+
+

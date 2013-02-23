@@ -25,7 +25,7 @@ class TestBasicRecipeStuff(unittest.TestCase):
         assert len(x) == 1              # should be only one recipe
         assert r in x
 
-    def test_get_recipe_2(self):
+    def test_add_recipe_2(self):
         r = recipes.Recipe('scotch on the rocks', [('blended scotch',
                                                    '4 oz')])
         db.add_recipe(r)
@@ -40,7 +40,6 @@ class TestBasicRecipeStuff(unittest.TestCase):
     def test_get_recipe_1(self):
         r = recipes.Recipe('scotch on the rocks', [('blended scotch',
                                                    '4 oz')])
-
         db.add_recipe(r)
 
         x = db.get_recipe('scotch on the rocks')
@@ -48,6 +47,9 @@ class TestBasicRecipeStuff(unittest.TestCase):
 
     def test_get_recipe_2(self):
         x = db.get_recipe('scotch on the rocks')
+        print type(db._recipe_db)
+        for x in db.get_all_recipes():
+            x.printRecipe()
         assert not x, x                    # no such recipe
 
 class TestIngredients(object):
@@ -107,6 +109,7 @@ class TestIngredients(object):
         r = recipes.Recipe('whiskey bath', [('blended scotch', '6 liter')])
 
         missing = r.need_ingredients()
+        print missing
         assert missing == [('blended scotch', 1000.0)]
 
     def test_generic_replacement_no_mix(self):

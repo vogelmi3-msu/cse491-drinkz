@@ -18,7 +18,6 @@ def data_reader(fp):
         try:
             if line[0].startswith('#'):
                 continue
-
             if not line[0].strip():
                 continue
         except IndexError:

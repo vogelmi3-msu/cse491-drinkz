@@ -10,7 +10,7 @@ _recipe_db = {}
 
 def _reset_db():
     "A method only to be used during testing -- toss the existing db info."
-    global _bottle_types_db, _inventory_db
+    global _bottle_types_db, _inventory_db, _recipe_db
     _bottle_types_db =set()
     _inventory_db = {}
     _recipe_db = {}
@@ -21,6 +21,9 @@ class LiquorMissing(Exception):
     pass
 
 class InvalidInput(Exception):
+    pass
+
+class DuplicateRecipeName(Exception):
     pass
 
 def add_bottle_type(mfg, liquor, typ):
@@ -59,27 +62,37 @@ def check_inventory(mfg, liquor):
     for key in _inventory_db:
         if mfg == key[0] and liquor == key[1]:
             return True
-        
     return False
+
+def check_inventory_for_type(typ):
+    available = []
+    for (m, l, t) in _bottle_types_db:
+        if t == typ:
+            available.append((m,l))
+    return available
+
+
 
 def get_liquor_amount(mfg, liquor):
     "Retrieve the total amount of any given liquor currently in inventory."
-    print _inventory_db.keys()
-#for key in _inventory_db:
-    #    print (key, _inventory_db[key],)
     amounts = _inventory_db[(mfg, liquor)] 
     totalVolume = 0.0
-
     for bottle in amounts:
-        amt = bottle.split()
-        if amt[1] == "oz":
-            totalVolume += float(amt[0]) * 29.5735
-        elif amt[1] == "gallon":
-            totalVolume +=float(amt[0]) * 3785.41
-        else:
-            totalVolume += float(amt[0])
-            
+        totalVolume += convert_to_ml(bottle)
     return totalVolume
+
+def convert_to_ml(amount):
+    amt = amount.split()
+    if amt[1] == "oz":
+        volume = float(amt[0]) * 29.5735
+    elif amt[1] == "gallon" or amt[1] == "Gallon":
+        volume =float(amt[0]) * 3785.41
+    elif amt[1] == "liter" or amt[1] == "Liter":
+        volume = float(amt[0]) * 1000.00
+    else:
+        volume = float(amt[0])
+    return volume
+
 
 def get_liquor_inventory():
     "Retrieve all liquor types in inventory, in tuple form: (mfg, liquor)."
@@ -88,14 +101,20 @@ def get_liquor_inventory():
 
 def add_recipe(r):
     key = r.getName()
-    value = r.getIngredients()
-    _recipe_db[key] = value
+    value = r
+    if (get_recipe(key)):
+        err = "recipe name in Database"
+        raise DuplicateRecipeName(err)
+    else:
+        _recipe_db[key] = value
 
 def get_recipe(name):
-    return _recipe_db[name]
-    
+    try:
+        return _recipe_db[name]
+    except(KeyError):
+        pass
 
 def get_all_recipes():
-    pass
+    return _recipe_db.values()
 
 
