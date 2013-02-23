@@ -117,4 +117,5 @@ def get_recipe(name):
 def get_all_recipes():
     return _recipe_db.values()
 
-
+def get_inventory():
+    return _inventory_db
