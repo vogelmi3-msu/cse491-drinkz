@@ -35,9 +35,3 @@ class Recipe:
 		else:
 
 			return needed
-
-	# def printRecipe(self):
- #    	print self.name
- #    	for ingd in self.ingredients:
- #    		print ingd
- #    	return true

@@ -82,15 +82,15 @@ def get_liquor_amount(mfg, liquor):
     return totalVolume
 
 def convert_to_ml(amount):
-    amt = amount.split()
-    if amt[1] == "oz":
-        volume = float(amt[0]) * 29.5735
-    elif amt[1] == "gallon" or amt[1] == "Gallon":
-        volume =float(amt[0]) * 3785.41
-    elif amt[1] == "liter" or amt[1] == "Liter":
-        volume = float(amt[0]) * 1000.00
+    (amt, unit) = amount.split()
+    if unit == "oz":
+        volume = float(amt) * 29.5735
+    elif unit == "gallon" or unit == "Gallon":
+        volume =float(amt) * 3785.41
+    elif unit == "liter" or unit == "Liter":
+        volume = float(amt) * 1000.00
     else:
-        volume = float(amt[0])
+        volume = float(amt)
     return volume
 
 
