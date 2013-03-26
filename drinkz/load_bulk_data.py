@@ -22,11 +22,7 @@ def data_reader(fp):
                 continue
         except IndexError:
             continue
-        try:
-            (mfg, name, val3) = line
-        except ValueError:
-            continue
-        yield mfg, name, val3
+        yield line
         
 
 def load_bottle_types(fp):
@@ -43,12 +39,15 @@ def load_bottle_types(fp):
     x = []
     n = 0
     while (1):
-  #      if typ == '' or liquor == '' or mfg == '':
-  #          pass
         try:
-            for mfg, name, typ in new_reader:
-                n += 1
-                db.add_bottle_type(mfg, name, typ)
+            for line in new_reader:
+                try:
+                    (mfg, name, typ)= line
+                    n += 1
+                    db.add_bottle_type(mfg, name, typ)
+                except ValueError:
+                    continue
+
             new_reader.next()
         except StopIteration:
             return n
@@ -76,9 +75,13 @@ def load_inventory(fp):
 
     while (1):
         try:
-            for mfg, liquor, amount in new_reader:
-                n += 1
-                db.add_to_inventory(mfg, liquor, amount)
+            for line in new_reader:
+                try:
+                    (mfg, liquor, amount)= line
+                    n += 1
+                    db.add_to_inventory(mfg, liquor, amount)
+                except ValueError:
+                    continue
             new_reader.next()
         except StopIteration:
             return n
