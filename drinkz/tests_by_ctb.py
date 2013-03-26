@@ -1,5 +1,6 @@
 """
 Miscellaneous professor tests.
+More like miscellaneous break our code tests.
 """
 
 import sys

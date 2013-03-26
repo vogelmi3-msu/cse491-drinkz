@@ -23,10 +23,9 @@ def data_reader(fp):
         except IndexError:
             continue
         try:
-            (mfg, name, val3)= line
+            (mfg, name, val3) = line
         except ValueError:
-            err = "Invalid input: missing amount"
-            raise db.InvalidInput(err)
+            continue
         yield mfg, name, val3
         
 
@@ -44,6 +43,8 @@ def load_bottle_types(fp):
     x = []
     n = 0
     while (1):
+  #      if typ == '' or liquor == '' or mfg == '':
+  #          pass
         try:
             for mfg, name, typ in new_reader:
                 n += 1
