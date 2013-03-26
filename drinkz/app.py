@@ -34,14 +34,22 @@ class SimpleApp(object):
         return fn(environ, start_response)
             
     def index(self, environ, start_response):
-    
+        data = generate_index_html()
         start_response('200 OK', list(html_headers))
         return [data]
         
-    def somefile(self, environ, start_response):
-        content_type = 'text/html'
-        data = open('somefile.html').read()
+    def recipes(self, environ, start_response):
+        data = generate_recipes_html()
+        start_response('200 OK', list(html_headers))
+        return [data]
 
+    def inventory(self, environ, start_response):
+        data = generate_inventory_html()
+        start_response('200 OK', list(html_headers))
+        return [data]
+
+    def liquorTypes(self, environ, start_response):
+        data = generate_liquor_types_html()
         start_response('200 OK', list(html_headers))
         return [data]
 
@@ -53,12 +61,6 @@ class SimpleApp(object):
         start_response('200 OK', list(html_headers))
         return [data]
 
-    def helmet(self, environ, start_response):
-        content_type = 'image/gif'
-        data = open('Spartan-helmet-Black-150-pxls.gif', 'rb').read()
-
-        start_response('200 OK', [('Content-type', content_type)])
-        return [data]
 
     def form(self, environ, start_response):
         data = form()

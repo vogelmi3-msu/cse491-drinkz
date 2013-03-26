@@ -44,12 +44,6 @@ db.add_recipe(r)
 #Index
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
-def generate_index():
-	data = generate_index_html()
-	fp = open('html/index.html','w')
-	print >>fp, data
-	fp.close()
-
 def generate_index_html():
 	data = """\
 	<h1>Drinkz </h1> 
@@ -68,17 +62,17 @@ def generate_index_html():
 #Recipes
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
-fp = open('html/recipes.html', 'w')
-print >> fp, """<h1> Recipes</h1>"""
-x = list(db.get_all_recipes())
-for recipe in x:
-	print >> fp, "<h2>%s</h2>" % (recipe.getName())
-	print >> fp, "<ul>"
-	for ing in recipe.getIngredients():
-		print >> fp, "<li>%s -- %s</li>" % (ing[0], ing[1])
-	print >> fp, "</ul>"
+def generate_recipes_html():
+	data = """<h1> Recipes</h1>"""
+	x = list(db.get_all_recipes())
+	for recipe in x:
+		data += "<h2>%s</h2>" % (recipe.getName())
+		data += "<ul>"
+		for ing in recipe.getIngredients():
+			data += "<li>%s -- %s</li>" % (ing[0], ing[1])
+		data += "</ul>"
 
-print >> fp, """<p> 
+	data += """<p> 
 <a href='index.html'>Home</a>
 </p>
 <p>
@@ -87,17 +81,6 @@ print >> fp, """<p>
 <p>
 <a href = 'liquor_types.html'>Liquor Types</a>
 </p>
-"""
-fp.close()
-def generate_recipes():
-	data = generate_recipe_html()
-	fp = open('html/recipe.html','w')
-	print >>fp, data
-	fp.close()
-
-def generate_recipes_html():
-	x = list(db.get_all_recipes())
-	data = """\
 """
 	return data
 
@@ -105,15 +88,14 @@ def generate_recipes_html():
 #Inventory
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
-fp = open('html/inventory.html', 'w')
+def generate_inventory_html():
+	data = """<h1> Inventory</h1>"""
+	data += "<ul>"
+	for bottle in db._inventory_db:
+		data += "<li>%s -- %s -- %s ml</li>" % (bottle[0], bottle[1], db.get_liquor_amount(bottle[0], bottle[1]))
+	data += "</ul>"
 
-print >> fp, """<h1> Inventory</h1>"""
-print >> fp, "<ul>"
-for bottle in db._inventory_db:
-	print >> fp, "<li>%s -- %s -- %s ml</li>" % (bottle[0], bottle[1], db.get_liquor_amount(bottle[0], bottle[1]))
-print >> fp, "</ul>"
-
-print >> fp, """
+	data += """
 <p> 
 <a href='index.html'>Home</a>
 </p>
@@ -124,21 +106,20 @@ print >> fp, """
 <a href = 'liquor_types.html'>Liquor Types</a>
 </p>
 """
-fp.close()
+	return data
 
 ###############################################################
 #Liquor Types
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
-fp = open('html/liquor_types.html', 'w')
+def generate_liquor_types_html():
+	data = """<h1> Types of Liquor Available for Your Pleasure</h1>"""
+	data += "<ul>"
+	for bottle in db._bottle_types_db:
+		data += "<li>%s -- %s -- %s</li>" % (bottle[0], bottle[1], bottle[2])
+	data += "</ul>"
 
-print >> fp, """<h1> Types of Liquor Available for Your Pleasure</h1>"""
-print >> fp, "<ul>"
-for bottle in db._bottle_types_db:
-	print >> fp, "<li>%s -- %s -- %s</li>" % (bottle[0], bottle[1], bottle[2])
-print >> fp, "</ul>"
-
-print >> fp, """
+	data += """
 <p> 
 <a href='index.html'>Home</a>
 </p>
@@ -149,8 +130,7 @@ print >> fp, """
 <a href = 'inventory.html'>Inventory</a>
 </p>
 """
-fp.close()
-
+	return data
 
 
 
