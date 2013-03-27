@@ -132,7 +132,15 @@ def generate_liquor_types_html():
 """
 	return data
 
+###############################################################
+# Convert all the things
+#Reference: github.com/ctb/cse491-linkz
+###############################################################
+def generate_convert_all_the_things_html():
+	data = """<h1> Convert all the things! </h1>"""
+	
 
+	return data
 
 
 

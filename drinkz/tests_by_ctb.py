@@ -66,7 +66,7 @@ def test_for_properly_named_run_script():
     assert os.path.exists('./bin/run-web')
 
 def test_for_properly_named_saveload_script():
-    # HW 4.2(a)
+    # HW 4.3(b)
     assert os.path.exists('./bin/make-test-database')
 
 def test_bulk_load_bottle_types_badformat():
