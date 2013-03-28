@@ -1,17 +1,23 @@
 
 #! /usr/bin/env python
-
+from wsgiref.simple_server import make_server
 import generate_html
 import urlparse
-import simplejson
+import json as simplejson
+import db
 
 dispatch = {
     '/' : 'index',
+    '/index.html' : 'index',
     '/content' : 'somefile',
     '/error' : 'error',
-    '/recipes' : 'recipes',
-    '/inventory' : 'inventory',
-    '/liquorTypes' : 'liquorTypes'
+    '/recipes.html' : 'recipes',
+    '/inventory.html' : 'inventory',
+    '/liquor_types.html' : 'liquorTypes',
+    '/recv' : 'recv',
+    '/form' : 'form',
+    '/convert_all_the_things_form': 'convert_all_the_things_form',
+    '/convert_all_the_things_recv' : 'convert_all_the_things_recv'
 }
 
 html_headers = [('Content-type', 'text/html')]
@@ -34,22 +40,22 @@ class SimpleApp(object):
         return fn(environ, start_response)
             
     def index(self, environ, start_response):
-        data = generate_index_html()
+        data = generate_html.generate_index_html()
         start_response('200 OK', list(html_headers))
         return [data]
         
     def recipes(self, environ, start_response):
-        data = generate_recipes_html()
+        data = generate_html.generate_recipes_html()
         start_response('200 OK', list(html_headers))
         return [data]
 
     def inventory(self, environ, start_response):
-        data = generate_inventory_html()
+        data = generate_html.generate_inventory_html()
         start_response('200 OK', list(html_headers))
         return [data]
 
     def liquorTypes(self, environ, start_response):
-        data = generate_liquor_types_html()
+        data = generate_html.generate_liquor_types_html()
         start_response('200 OK', list(html_headers))
         return [data]
 
@@ -61,29 +67,8 @@ class SimpleApp(object):
         start_response('200 OK', list(html_headers))
         return [data]
 
-
-    def form(self, environ, start_response):
-        data = form()
-
-        start_response('200 OK', list(html_headers))
-        return [data]
-   
-    def recv(self, environ, start_response):
-        formdata = environ['QUERY_STRING']
-        results = urlparse.parse_qs(formdata)
-
-        firstname = results['firstname'][0]
-        lastname = results['lastname'][0]
-
-        content_type = 'text/html'
-        data = "First name: %s; last name: %s.  <a href='./'>return to index</a>" % (firstname, lastname)
-
-        start_response('200 OK', list(html_headers))
-        return [data]
-
     def convert_all_the_things_form(self, environ, start_response):
         data = convert_all_the_things_form()
-
         start_response('200 OK', list(html_headers))
         return [data]
    
@@ -91,12 +76,26 @@ class SimpleApp(object):
         formdata = environ['QUERY_STRING']
         results = urlparse.parse_qs(formdata)
 
-        firstname = results['firstname'][0]
-        lastname = results['lastname'][0]
-
+        amount_to_convert = results['InputAmt'][0]
+        converted_amt = db.convert_to_ml(amount_to_convert)
         content_type = 'text/html'
-        data = "First name: %s; last name: %s.  <a href='./'>return to index</a>" % (firstname, lastname)
-
+        data = "Amount to Convert: %s; Converted volume: %s mL. " % (amount_to_convert, converted_amt)
+        data += """<p>
+<a href = 'convert_all_the_things_form'>Convert another volume?</a>
+</p>
+<p> 
+<a href='index.html'>Home</a>
+</p>
+<p>
+<a href = 'recipes.html'>Recipes</a>
+</p>
+<p>
+<a href = 'liquor_types.html'>Liquor Types</a>
+</p>
+<p>
+<a href = 'inventory.html'>Inventory</a>
+</p>
+"""
         start_response('200 OK', list(html_headers))
         return [data]
 
@@ -147,61 +146,23 @@ class SimpleApp(object):
         return int(a) + int(b)
 
 def convert_all_the_things_form():
-    #header, footer = generate_html.load_header_footer()
-    # data =  """\
-    # <div class="row-fluid">
-    #     <div class="span8">
-    #         <form class="form-horizontal" action="/recv_conversion">
-    #             <div class="control-group">
-    #                 <label for="amount" class="control-label">Amount of Liquid:</label>
-    #                 <div class="controls">
-    #                     <input type="text" name="amount" id="amount" size="20">
-    #                 </div>
-    #             </div>
-
-    #             <div class="control-group">
-    #                 <label for="unit" class="control-label">Unit:</label>
-    #                 <div class="controls">
-    #                     <select name="unit" id="unit">
-    #                         <option value="oz">oz</option>
-    #                         <option value="gallon">gallons</option>
-    #                         <option value="liter">liters</option>
-    #                     </select>
-    #                 </div>
-    #             </div>
-
-    #             <div class="control-group">
-    #                 <div class="controls">
-    #                     <button type="submit" class="btn btn-primary">Submit</button>
-    #                 </div>
-    #             </div>
-    #         </form>
-    #     </div>
-    # </div>
-    # """
-
-    # return data
         return """
-<form action='recv'>
-Input the volume and units? <input type='text' name='firstname' size'20'>
+<form action='convert_all_the_things_recv'>
+Input the volume and units? (oz, gallon, or liter) <input type='text' name='InputAmt' size'20'>
 <input type='submit'>
 </form>
+<p> 
+<a href='index.html'>Home</a>
+</p>
+<p>
+<a href = 'recipes.html'>Recipes</a>
+</p>
+<p>
+<a href = 'liquor_types.html'>Liquor Types</a>
+</p>
+<p>
+<a href = 'inventory.html'>Inventory</a>
+</p>
+
 """
 
-def convert_all_the_things_result(amount, unit, amount_converted):
-   # header, footer = generate_html.load_header_footer()
-    amount_entered = "<h2>Amount Entered: %s %s</h2>" % (amount, unit)
-    amount_converted = "<h2>Amount Converted: %.2f mL</h2>" % amount_converted
-    data = """\
-    <div class="row-fluid">
-        <div class="hero-unit">
-    """
-    data += amount_entered
-    data += amount_converted
-    data += """\
-            <p><a href="/" class="btn btn-primary btn-large" style="margin-top: 2em;">Return to Home</a></p>
-        </div>
-    </div>
-    """
-
-    return header + data + footer

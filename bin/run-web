@@ -8,6 +8,7 @@ from drinkz.app import SimpleApp
 if __name__ == '__main__':
     import random, socket
     port = random.randint(8000, 9999)
+    print port
     
     app = SimpleApp()
     

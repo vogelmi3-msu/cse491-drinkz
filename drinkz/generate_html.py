@@ -1,10 +1,18 @@
-from drinkz import db, recipes
+#from drinkz
+import db
+import recipes
 import os
 
 try:
 	os.mkdir('html')
 except OSError:
 	pass
+
+try:
+	os.mkdir('html/subdir')
+except OSError:
+	pass
+
 
 
 ########################################################################
@@ -45,7 +53,7 @@ db.add_recipe(r)
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
 def generate_index_html():
-	data = """\
+	data = """
 	<h1>Drinkz </h1> 
 <p> 
 <a href='recipes.html'>Recipes</a>
@@ -55,6 +63,9 @@ def generate_index_html():
 </p>
 <p>
 <a href = 'liquor_types.html'>Liquor Types</a>
+</p>
+<p>
+<a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
 	"""
 	return data
@@ -81,6 +92,9 @@ def generate_recipes_html():
 <p>
 <a href = 'liquor_types.html'>Liquor Types</a>
 </p>
+<p>
+<a href = 'convert_all_the_things_form'>Conversion Page</a>
+</p>
 """
 	return data
 
@@ -105,6 +119,9 @@ def generate_inventory_html():
 <p>
 <a href = 'liquor_types.html'>Liquor Types</a>
 </p>
+<p>
+<a href = 'convert_all_the_things_form'>Conversion Page</a>
+</p>
 """
 	return data
 
@@ -128,6 +145,9 @@ def generate_liquor_types_html():
 </p>
 <p>
 <a href = 'inventory.html'>Inventory</a>
+</p>
+<p>
+<a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
 """
 	return data
