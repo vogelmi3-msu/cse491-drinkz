@@ -2,7 +2,7 @@
 import sys
 import _mypath
 
-from drinkz.db import save_db, load_db
+from db import save_db, load_db
 
 def main(args):
    filename = args[1]

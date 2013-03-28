@@ -4,6 +4,12 @@ import _mypath
 from wsgiref.simple_server import make_server
 
 from drinkz.app import SimpleApp
+from drinkz import db
+
+
+#run run-web from the cse491-drinkz directory NOT BIN
+#filename = "bin/make-test-database"
+#db.load_db(filename)
 
 if __name__ == '__main__':
     import random, socket

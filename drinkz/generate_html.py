@@ -19,7 +19,7 @@ except OSError:
 #Add items to the inventory
 #Copied the drinks from drinkz/test_recipes.py
 ########################################################################
-#add things to the inventory
+
 db._reset_db()
 
 db.add_bottle_type('Johnnie Walker', 'black label', 'blended scotch')
@@ -54,6 +54,20 @@ db.add_recipe(r)
 ###############################################################
 def generate_index_html():
 	data = """
+	<html>
+	<head>
+	<title>Index</title>
+	<style type ="text/css">
+		h1{color:red;}
+	</style>
+	<script>
+	function myFunction()
+	{
+		alert("Hello! I am an alert box!");
+	}
+	</script>
+	</head>
+	<body>
 	<h1>Drinkz </h1> 
 <p> 
 <a href='recipes.html'>Recipes</a>
@@ -67,6 +81,12 @@ def generate_index_html():
 <p>
 <a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
+<p>
+	<input type="button" onclick="myFunction()" value="Show alert box" />
+	</p>
+
+</body>
+</html>
 	"""
 	return data
 ###############################################################
@@ -74,7 +94,15 @@ def generate_index_html():
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
 def generate_recipes_html():
-	data = """<h1> Recipes</h1>"""
+	data = """
+		<html>
+	<head>
+	<title>Recipes</title>
+		<style type ="text/css">
+		h1{color:red;}
+	</style>
+	</head>
+	<body><h1> Recipes</h1>"""
 	x = list(db.get_all_recipes())
 	for recipe in x:
 		data += "<h2>%s</h2>" % (recipe.getName())
@@ -95,6 +123,8 @@ def generate_recipes_html():
 <p>
 <a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
+</body>
+</html>
 """
 	return data
 
@@ -103,7 +133,14 @@ def generate_recipes_html():
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
 def generate_inventory_html():
-	data = """<h1> Inventory</h1>"""
+	data = """	<html>
+	<head>
+	<title>Inventory</title>
+		<style type ="text/css">
+		h1{color:red;}
+	</style>
+	</head>
+	<body><h1> Inventory</h1>"""
 	data += "<ul>"
 	for bottle in db._inventory_db:
 		data += "<li>%s -- %s -- %s ml</li>" % (bottle[0], bottle[1], db.get_liquor_amount(bottle[0], bottle[1]))
@@ -122,6 +159,8 @@ def generate_inventory_html():
 <p>
 <a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
+</body>
+</html>
 """
 	return data
 
@@ -130,7 +169,14 @@ def generate_inventory_html():
 #Reference: github.com/ctb/cse491-linkz
 ###############################################################
 def generate_liquor_types_html():
-	data = """<h1> Types of Liquor Available for Your Pleasure</h1>"""
+	data = """	<html>
+	<head>
+	<title>Liquor Types</title>
+		<style type ="text/css">
+		h1{color:red;}
+	</style>
+	</head>
+	<body><h1> Types of Liquor Available for Your Pleasure</h1>"""
 	data += "<ul>"
 	for bottle in db._bottle_types_db:
 		data += "<li>%s -- %s -- %s</li>" % (bottle[0], bottle[1], bottle[2])
@@ -149,19 +195,10 @@ def generate_liquor_types_html():
 <p>
 <a href = 'convert_all_the_things_form'>Conversion Page</a>
 </p>
+</body>
+</html>
 """
 	return data
-
-###############################################################
-# Convert all the things
-#Reference: github.com/ctb/cse491-linkz
-###############################################################
-def generate_convert_all_the_things_html():
-	data = """<h1> Convert all the things! </h1>"""
-	
-
-	return data
-
 
 
 

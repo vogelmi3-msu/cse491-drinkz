@@ -79,7 +79,15 @@ class SimpleApp(object):
         amount_to_convert = results['InputAmt'][0]
         converted_amt = db.convert_to_ml(amount_to_convert)
         content_type = 'text/html'
-        data = "Amount to Convert: %s; Converted volume: %s mL. " % (amount_to_convert, converted_amt)
+        data = """  <html>
+    <head>
+    <title>Converted!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>"""
+        data += """<h1> Converted! </h1> <p>Amount to Convert: %s; Converted volume: %s mL. </p>""" % (amount_to_convert, converted_amt)
         data += """<p>
 <a href = 'convert_all_the_things_form'>Convert another volume?</a>
 </p>
@@ -95,6 +103,8 @@ class SimpleApp(object):
 <p>
 <a href = 'inventory.html'>Inventory</a>
 </p>
+</body>
+</html>
 """
         start_response('200 OK', list(html_headers))
         return [data]
@@ -146,7 +156,15 @@ class SimpleApp(object):
         return int(a) + int(b)
 
 def convert_all_the_things_form():
-        return """
+        return """  <html>
+    <head>
+    <title>Convert!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>
+    <h1> Convert!</h1>
 <form action='convert_all_the_things_recv'>
 Input the volume and units? (oz, gallon, or liter) <input type='text' name='InputAmt' size'20'>
 <input type='submit'>
@@ -163,6 +181,7 @@ Input the volume and units? (oz, gallon, or liter) <input type='text' name='Inpu
 <p>
 <a href = 'inventory.html'>Inventory</a>
 </p>
-
+</body>
+</html>
 """
 
