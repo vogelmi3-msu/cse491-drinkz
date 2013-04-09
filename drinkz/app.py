@@ -25,6 +25,7 @@ html_headers = [('Content-type', 'text/html')]
 class SimpleApp(object):
     def __call__(self, environ, start_response):
 
+        generate_html.create_data()
         path = environ['PATH_INFO']
         fn_name = dispatch.get(path, 'error')
 
