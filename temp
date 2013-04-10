@@ -1,0 +1,91 @@
+    def add_liquor_type_form(self, environ, start_response):
+        data = add_liquor_type_form()
+        start_response('200 OK', list(html_headers))
+        return [data]
+   
+    def add_liquor_type_recv(self, environ, start_response):
+        formdata = environ['QUERY_STRING']
+        results = urlparse.parse_qs(formdata)
+
+        mfg = results['mfg'][0]
+        liquor = results['liquor'][0]
+        typ = results['typ'][0]
+        taste_of_failure = add_bottle_type(mfg, liquor, typ)
+        
+        if taste_of_failure == NULL:
+            data = generate_html.generate_liquor_types_html()
+
+        else:
+            content_type = 'text/html'
+            data = """  <html>
+    <head>
+    <title>Failure to Add Liquor!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>"""
+            data += """Failed to add Liquor type, please try again!"""
+            data += """<p>
+<a href = 'convert_all_the_things_form'>Convert all the things!</a>
+</p>
+<p> 
+<a href='index.html'>Home</a>
+</p>
+<p>
+<a href = 'recipes.html'>Recipes</a>
+</p>
+<p>
+<a href = 'liquor_types.html'>Liquor Types</a>
+</p>
+<p>
+<a href = 'inventory.html'>Inventory</a>
+</p>
+</body>
+</html>
+"""
+        start_response('200 OK', list(html_headers))
+        return [data]
+
+
+def add_liquor_type_form():
+        return """  <html>
+    <head>
+    <title>Add Liquor!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>
+    <h1> Add liquor to your cabinet!</h1>
+<p>
+The following information is required to add a liquor type to the inventory: "
+<form action='add_liquor_type_recv'>
+Manufacturer (e.g. Johnny Walker) <input type='text' name='mfg' size'20'>
+Liquor (e.g. Black Label) <input type='text' name='liquor' size'20'>
+Type (e.g. blended sc) otch<input type='text' name='typ' size'20'>
+<input type='submit'>
+
+</form>
+<p> 
+<a href='index.html'>Home</a>
+</p>
+<p>
+<a href = 'recipes.html'>Recipes</a>
+</p>
+<p>
+<a href = 'liquor_types.html'>Liquor Types</a>
+</p>
+<p>
+<a href = 'inventory.html'>Inventory</a>
+</p>
+<p>
+<a href = 'convert_all_the_things_form.html'>Convert all the things!</a>
+</p>
+</body>
+</html>
+"""
+
+
+#def add_bottle_type(mfg, liquor, typ):
+

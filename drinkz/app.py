@@ -5,6 +5,7 @@ import generate_html
 import urlparse
 import json as simplejson
 import db
+import recipes
 
 dispatch = {
     '/' : 'index',
@@ -14,10 +15,17 @@ dispatch = {
     '/recipes.html' : 'recipes',
     '/inventory.html' : 'inventory',
     '/liquor_types.html' : 'liquorTypes',
+    '/recipes_that_can_be_made_html' : 'producable_recipes',
     '/recv' : 'recv',
     '/form' : 'form',
     '/convert_all_the_things_form': 'convert_all_the_things_form',
-    '/convert_all_the_things_recv' : 'convert_all_the_things_recv'
+    '/convert_all_the_things_recv' : 'convert_all_the_things_recv',
+    '/add_liquor_type_form': 'add_liquor_type_form',
+    '/add_liquor_type_recv': 'add_liquor_type_recv',
+    '/add_to_inventory_form': 'add_to_inventory_form',
+    '/add_to_inventory_recv': 'add_to_inventory_recv',
+    '/add_a_new_recipe_form': 'add_a_new_recipe_form',
+    '/add_a_new_recipe_recv': 'add_a_new_recipe_recv'
 }
 
 html_headers = [('Content-type', 'text/html')]
@@ -25,7 +33,8 @@ html_headers = [('Content-type', 'text/html')]
 class SimpleApp(object):
     def __call__(self, environ, start_response):
 
-        generate_html.create_data()
+        #load from file
+        generate_html.create_data('bin/sample_database')
         path = environ['PATH_INFO']
         fn_name = dispatch.get(path, 'error')
 
@@ -50,6 +59,12 @@ class SimpleApp(object):
         start_response('200 OK', list(html_headers))
         return [data]
 
+    def producable_recipes(self, environ, start_response):
+        data = generate_html.generate_recipes_that_can_be_made_html()
+        start_response('200 OK', list(html_headers))
+        return [data]
+
+
     def inventory(self, environ, start_response):
         data = generate_html.generate_inventory_html()
         start_response('200 OK', list(html_headers))
@@ -69,7 +84,7 @@ class SimpleApp(object):
         return [data]
 
     def convert_all_the_things_form(self, environ, start_response):
-        data = convert_all_the_things_form()
+        data = generate_html.convert_all_the_things_form()
         start_response('200 OK', list(html_headers))
         return [data]
    
@@ -89,27 +104,136 @@ class SimpleApp(object):
     </head>
     <body>"""
         data += """<h1> Converted! </h1> <p>Amount to Convert: %s; Converted volume: %s mL. </p>""" % (amount_to_convert, converted_amt)
-        data += """<p>
-<a href = 'convert_all_the_things_form'>Convert another volume?</a>
-</p>
-<p> 
-<a href='index.html'>Home</a>
-</p>
-<p>
-<a href = 'recipes.html'>Recipes</a>
-</p>
-<p>
-<a href = 'liquor_types.html'>Liquor Types</a>
-</p>
-<p>
-<a href = 'inventory.html'>Inventory</a>
-</p>
+        
+        data += generate_html.generate_menu()
+        data += """
 </body>
 </html>
 """
         start_response('200 OK', list(html_headers))
         return [data]
 
+    def add_liquor_type_form(self, environ, start_response):
+        data = generate_html.add_liquor_type_form()
+        start_response('200 OK', list(html_headers))
+        return [data]
+   
+    def add_liquor_type_recv(self, environ, start_response):
+        formdata = environ['QUERY_STRING']
+        results = urlparse.parse_qs(formdata)
+        mfg = results['mfg'][0]
+        liquor = results['liquor'][0]
+        typ = results['typ'][0]
+        db.add_bottle_type(mfg, liquor, typ)
+        db.save_db('bin/sample_database')
+        taste_of_success = db._check_bottle_type_exists(mfg, liquor)
+        if taste_of_success == True:
+            data = generate_html.generate_liquor_types_html()
+
+        else:
+            content_type = 'text/html'
+            data = """  <html>
+    <head>
+    <title>Failure to Add Liquor!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>"""
+            data += """Failed to add Liquor type, please try again!"""
+            data += generate_html.generate_menu()
+            data += """
+</body>
+</html>
+"""     
+        start_response('200 OK', list(html_headers))
+        return [data]
+
+
+    def add_to_inventory_form(self, environ, start_response):
+        data = generate_html.add_to_inventory_form()
+        start_response('200 OK', list(html_headers))
+        return [data]
+   
+    def add_to_inventory_recv(self, environ, start_response):
+        formdata = environ['QUERY_STRING']
+        results = urlparse.parse_qs(formdata)
+
+        mfg = results['mfg'][0]
+        liquor = results['liquor'][0]
+        amount = results['amount'][0]
+        myBool = db.check_inventory(mfg,liquor)
+        if myBool == True:
+            intial_amt = db.get_liquor_amount(mfg,liquor)
+        else:
+            intial_amt = 0
+        db.add_to_inventory(mfg, liquor, amount)
+        db.save_db('bin/sample_database')
+        taste_of_success = db.check_inventory(mfg, liquor)
+        amt_success = db.get_liquor_amount(mfg,liquor)
+        if taste_of_success == True and amt_success > intial_amt:
+            data = generate_html.generate_liquor_types_html()
+
+        else:
+            content_type = 'text/html'
+            data = """  <html>
+    <head>
+    <title>Failure to Add Liquor!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>"""
+            data += """Failed to add Liquor type, please try again!"""
+            data += generate_html.generate_menu()
+            data += """
+</body>
+</html>
+"""     
+        start_response('200 OK', list(html_headers))
+        return [data]
+
+    def add_a_new_recipe_form(self, environ, start_response):
+        data = generate_html.add_a_new_recipe_form()
+        start_response('200 OK', list(html_headers))
+        return [data]
+   
+    def add_a_new_recipe_recv(self, environ, start_response):
+        formdata = environ['QUERY_STRING']
+        results = urlparse.parse_qs(formdata)
+
+        name = results['name'][0]
+        ings = results['ings'][0]
+        indv_ings = ings.split(',')
+        ind_list =[]
+        for item in indv_ings:
+            myTup = tuple(item.split(':'))
+            ind_list.append(myTup)
+        
+        recipe = recipes.Recipe(name,ind_list)
+        db.add_recipe(recipe)
+        db.save_db('bin/sample_database')
+        taste_of_success = db.get_recipe(name)
+        if taste_of_success == recipe:
+            data = generate_html.generate_recipes_html()
+        else:
+            content_type = 'text/html'
+            data = """  <html>
+    <head>
+    <title>Failure to add recipe!</title>
+        <style type ="text/css">
+        h1{color:red;}
+    </style>
+    </head>
+    <body>"""
+            data += """Failed to add Recipe, please try again!"""
+            data += generate_html.generate_menu()
+            data += """
+</body>
+</html>
+"""     
+        start_response('200 OK', list(html_headers))
+        return [data]
     def dispatch_rpc(self, environ, start_response):
         # POST requests deliver input data via a file-like handle,
         # with the size of the data specified by CONTENT_LENGTH;
@@ -156,33 +280,5 @@ class SimpleApp(object):
     def rpc_add(self, a, b):
         return int(a) + int(b)
 
-def convert_all_the_things_form():
-        return """  <html>
-    <head>
-    <title>Convert!</title>
-        <style type ="text/css">
-        h1{color:red;}
-    </style>
-    </head>
-    <body>
-    <h1> Convert!</h1>
-<form action='convert_all_the_things_recv'>
-Input the volume and units? (oz, gallon, or liter) <input type='text' name='InputAmt' size'20'>
-<input type='submit'>
-</form>
-<p> 
-<a href='index.html'>Home</a>
-</p>
-<p>
-<a href = 'recipes.html'>Recipes</a>
-</p>
-<p>
-<a href = 'liquor_types.html'>Liquor Types</a>
-</p>
-<p>
-<a href = 'inventory.html'>Inventory</a>
-</p>
-</body>
-</html>
-"""
+
 

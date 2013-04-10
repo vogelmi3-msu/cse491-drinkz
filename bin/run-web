@@ -13,7 +13,8 @@ from drinkz import db
 
 if __name__ == '__main__':
     import random, socket
-    port = random.randint(8000, 9999)
+    #port = random.randint(8000, 9999)
+    port = 8638
     print port
     
     app = SimpleApp()

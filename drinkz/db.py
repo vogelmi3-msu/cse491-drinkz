@@ -3,7 +3,7 @@ Database functionality for drinkz information.
 """
 
 from cPickle import dump, load
-
+import recipes as rc
 
 # private singleton variables at module level
 _bottle_types_db =set()
@@ -30,7 +30,7 @@ def load_db(filename):
     fp = open(filename, 'rb')
 
     loaded = load(fp)
-    (_bottle_types_db, _inventory_db) = loaded
+    (_bottle_types_db, _inventory_db, _recipe_db) = loaded
 
     fp.close()
 
@@ -138,3 +138,27 @@ def get_all_recipes():
 
 def get_inventory():
     return _inventory_db
+
+def recipes_we_can_make():
+    recipes_we_can_make_list = []
+    for name in _recipe_db:
+        recipe = _recipe_db[name]
+        print recipe
+        ingredient_list = recipe.getIngredients()
+        all_ingred = []
+        for (typ,amt) in ingredient_list:
+            
+            avail = check_inventory_for_type(typ)
+            avail_amt = 0
+            for (m,l) in avail:
+                avail_amt += get_liquor_amount(m,l)
+            
+            if avail_amt > convert_to_ml(amt):
+                all_ingred.append(avail_amt)
+        if len(all_ingred) == len(ingredient_list):
+            print "hells yes"
+            recipes_we_can_make_list.append(recipe)
+
+    print recipes_we_can_make_list
+    return recipes_we_can_make_list
+
