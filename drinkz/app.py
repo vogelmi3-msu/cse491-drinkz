@@ -3,7 +3,7 @@
 from wsgiref.simple_server import make_server
 import generate_html
 import urlparse
-import json as simplejson
+import simplejson
 import db
 import recipes
 
@@ -234,6 +234,8 @@ class SimpleApp(object):
 """     
         start_response('200 OK', list(html_headers))
         return [data]
+
+
     def dispatch_rpc(self, environ, start_response):
         # POST requests deliver input data via a file-like handle,
         # with the size of the data specified by CONTENT_LENGTH;
@@ -280,5 +282,16 @@ class SimpleApp(object):
     def rpc_add(self, a, b):
         return int(a) + int(b)
 
+    def rpc_add_recipe(self, name, ingredients):
+        r = recipes.Recipe(name,ingredient_list)
+        return db.add_recipe(r)
 
+    def rpc_add_to_inventory(self, mfg,liquor,amt ):
+        return db.add_to_inventory(mfg,liquor,amt)
+
+    def rpc_add_bottle_type(self, mfg, liquor,typ):
+        return db.add_bottle_type(mfg,liquor,typ)
+
+    def rpc_producable_recipes(self):
+        return list(db.recipes_we_can_make())
 

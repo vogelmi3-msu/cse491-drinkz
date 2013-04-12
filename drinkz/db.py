@@ -156,7 +156,6 @@ def recipes_we_can_make():
             if avail_amt > convert_to_ml(amt):
                 all_ingred.append(avail_amt)
         if len(all_ingred) == len(ingredient_list):
-            print "hells yes"
             recipes_we_can_make_list.append(recipe)
 
     print recipes_we_can_make_list
