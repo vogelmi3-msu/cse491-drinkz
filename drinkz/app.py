@@ -194,11 +194,13 @@ class SimpleApp(object):
         return [data]
 
     def add_a_new_recipe_form(self, environ, start_response):
+        print "in add_a_new_recipe_form"
         data = generate_html.add_a_new_recipe_form()
         start_response('200 OK', list(html_headers))
         return [data]
    
     def add_a_new_recipe_recv(self, environ, start_response):
+        print "in add_a_new_recipe_recv"
         formdata = environ['QUERY_STRING']
         results = urlparse.parse_qs(formdata)
 
@@ -283,6 +285,7 @@ class SimpleApp(object):
         return int(a) + int(b)
 
     def rpc_add_recipe(self, name, ingredients):
+        print "made it to rpc_add_recipe"
         r = recipes.Recipe(name,ingredient_list)
         return db.add_recipe(r)
 
