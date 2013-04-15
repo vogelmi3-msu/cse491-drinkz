@@ -7,17 +7,19 @@ import simplejson
 import db
 import recipes
 
+import os
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 dispatch = {
     '/' : 'index',
     '/index.html' : 'index',
-    '/content' : 'somefile',
     '/error' : 'error',
     '/recipes.html' : 'recipes',
     '/inventory.html' : 'inventory',
     '/liquor_types.html' : 'liquorTypes',
     '/recipes_that_can_be_made_html' : 'producable_recipes',
-    '/recv' : 'recv',
-    '/form' : 'form',
     '/convert_all_the_things_form': 'convert_all_the_things_form',
     '/convert_all_the_things_recv' : 'convert_all_the_things_recv',
     '/add_liquor_type_form': 'add_liquor_type_form',
@@ -25,7 +27,11 @@ dispatch = {
     '/add_to_inventory_form': 'add_to_inventory_form',
     '/add_to_inventory_recv': 'add_to_inventory_recv',
     '/add_a_new_recipe_form': 'add_a_new_recipe_form',
-    '/add_a_new_recipe_recv': 'add_a_new_recipe_recv'
+    '/add_a_new_recipe_recv': 'add_a_new_recipe_recv',
+    '/rpc'  : 'dispatch_rpc',
+    '/view_image.html' : 'view_image'
+
+
 }
 
 html_headers = [('Content-type', 'text/html')]
@@ -34,7 +40,9 @@ class SimpleApp(object):
     def __call__(self, environ, start_response):
 
         #load from file
-        generate_html.create_data('bin/sample_database')
+        
+        generate_html.create_data('bin/sample_database') # in bin/run-web now (comment out??)
+
         path = environ['PATH_INFO']
         fn_name = dispatch.get(path, 'error')
 
@@ -237,6 +245,13 @@ class SimpleApp(object):
         start_response('200 OK', list(html_headers))
         return [data]
 
+    def view_image(self, environ, start_response):
+        content_type = 'image/jpg'
+        pth = os.path.dirname(__file__)
+        filename = pth + '/searchbyspirit.jpg'
+        data = open(filename, 'rb').read()
+        start_response('200 OK', [('Content-Type', content_type)])
+        return [data]
 
     def dispatch_rpc(self, environ, start_response):
         # POST requests deliver input data via a file-like handle,
@@ -285,8 +300,7 @@ class SimpleApp(object):
         return int(a) + int(b)
 
     def rpc_add_recipe(self, name, ingredients):
-        print "made it to rpc_add_recipe"
-        r = recipes.Recipe(name,ingredient_list)
+        r = recipes.Recipe(name,ingredients)
         return db.add_recipe(r)
 
     def rpc_add_to_inventory(self, mfg,liquor,amt ):

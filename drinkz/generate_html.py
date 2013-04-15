@@ -86,6 +86,9 @@ def generate_menu():
 <p>
 <a href = 'add_a_new_recipe_form'>Add a New Recipe!</a>
 </p>
+<p>
+<a href = 'view_image.html'>Sweet Image!</a>
+</p>
  
 """
 	return data

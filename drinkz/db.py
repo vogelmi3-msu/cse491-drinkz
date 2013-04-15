@@ -4,6 +4,10 @@ Database functionality for drinkz information.
 
 from cPickle import dump, load
 import recipes as rc
+import sys
+import os.path
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # private singleton variables at module level
 _bottle_types_db =set()
@@ -45,6 +49,9 @@ class InvalidInput(Exception):
 class DuplicateRecipeName(Exception):
     pass
 
+class YourRecipeFormatSucks(Exception):
+    pass
+
 def add_bottle_type(mfg, liquor, typ):
     "Add the given bottle type into the drinkz database."
     _bottle_types_db.add((mfg, liquor, typ))
@@ -52,6 +59,12 @@ def add_bottle_type(mfg, liquor, typ):
 def _check_bottle_type_exists(mfg, liquor):
     for (m, l, _) in _bottle_types_db:
         if mfg == m and liquor == l:
+            return True
+    return False
+
+def _check_recipe_exists(name):
+    for r in _recipe_db:
+        if name == r:
             return True
     return False
 
@@ -143,7 +156,6 @@ def recipes_we_can_make():
     recipes_we_can_make_list = []
     for name in _recipe_db:
         recipe = _recipe_db[name]
-        print recipe
         ingredient_list = recipe.getIngredients()
         all_ingred = []
         for (typ,amt) in ingredient_list:
@@ -157,7 +169,5 @@ def recipes_we_can_make():
                 all_ingred.append(avail_amt)
         if len(all_ingred) == len(ingredient_list):
             recipes_we_can_make_list.append(recipe)
-
-    print recipes_we_can_make_list
     return recipes_we_can_make_list
 
