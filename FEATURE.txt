@@ -28,3 +28,24 @@ recipe (might automatically give average price for each recipe)
 average cost of making said recipe.
 
 *Collaborated with Madalyn Parker*
+
+
+Maddy's Feature: Figure out alcohol content of recipes
+
+Summary:
+
+Using a database of alcohol types that includes proofs, calculate how much alcohol each recipe contains. This can later be used to see how many standard drinks the recipe is worth, how drunk it should make you based on weight, and how quickly the effects should wear off. 
+
+Stories:
+
+A: Suzy wants to make some cocktails for a movie viewing she is having at her house but knows her friends will want to drive home after. She goes to the site to see which drinks would have relatively low alcohol contents so she can server her friends delicious drinks that won't get them too drunk before the movie is over.
+
+B: Paul made several drinks last night and ended up getting really sick. He is curious how much he had so he can aim to have less alcohol next time.
+
+Features:
+1: Find a database that lists proofs for different bottle types, store this database and access it through app
+2: Calculate alcohol content for each recipe
+3: List alcohol content for each recipe on the web 
+4: Have JSON-RPC return alcohol content of recipe, given recipe name
+
+*Collaborated with Michelle Vogel -- she has a different feature*

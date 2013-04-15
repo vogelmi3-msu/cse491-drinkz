@@ -83,7 +83,6 @@ def test_form_unit_conversion(args):
 
 	assert present
 
-
 ##########################################
 #Test image_retrieval
 #########################################
@@ -132,6 +131,5 @@ if __name__ == '__main__':
     test_form_unit_conversion(sys.argv)
     #test image retrieval
     test_image_retrieval(sys.argv)
-
 
 
