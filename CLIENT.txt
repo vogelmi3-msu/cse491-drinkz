@@ -1,0 +1,8 @@
+1: with one terminal go to the root directory: cse491-drinkz
+2: run the web by typing: python2.7 bin/run-web
+   you will see a message that tells you what port you are using
+
+3. open a second terminal, go to the root directory cse491-drinkz
+4. run the client program by typing:
+   python2.6 bin/client.py arctic.cse.msu.edu [portNumber]
+   where [portNumber] is provide in the 1st terminal

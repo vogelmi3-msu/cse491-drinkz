@@ -1,0 +1,30 @@
+Michelle's Feature:
+
+Summary:
+I will be supporting the calcualtion of the cost of a drink.
+Given a recipe(s) and an inventory, you will be able to calculate the
+cost of the recipe(s).
+
+Stories:
+
+A: Michelle wants to make a long-island ice tea with the alcohol in her
+inventory, but wants to know how much the drink itself is worth. This
+will allow her to decide if it is cheaper in the long run to purchase
+her alcohol and drink at home or go to the bar.
+
+B: Maddy knows that it is cheaper to make drinks at home and at the
+bar but wants to show her roomates at the co-op how much $$ they will
+save by drinking at home.
+
+Features:
+1. Find a database that has the price of the liquor, and store it in
+our database/give our database/app access to it
+2. Given a recipe, find out how much it costs to make. If there are
+multiple options for a given ingredient (well vs top shelf) give all
+the permutations of the cost of the drink.
+3. Web interface that can be used to caclulate the price of a given
+recipe (might automatically give average price for each recipe)
+4. Have JSON-RPC functions that given a recipe will return the
+average cost of making said recipe.
+
+*Collaborated with Madalyn Parker*
