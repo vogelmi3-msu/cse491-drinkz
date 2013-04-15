@@ -17,8 +17,8 @@ from drinkz import recipes
 
 if __name__ == '__main__':
     import random, socket
-    #port = random.randint(8000, 9999)
-    port = 8638
+    port = random.randint(8000, 9999)
+    #port = 8638
     print port
 
     #load from file
