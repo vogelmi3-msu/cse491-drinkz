@@ -3,21 +3,23 @@
 from wsgiref.simple_server import make_server
 import generate_html
 import urlparse
-import json as simplejson
+import simplejson
 import db
 import recipes
+
+import os
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 dispatch = {
     '/' : 'index',
     '/index.html' : 'index',
-    '/content' : 'somefile',
     '/error' : 'error',
     '/recipes.html' : 'recipes',
     '/inventory.html' : 'inventory',
     '/liquor_types.html' : 'liquorTypes',
     '/recipes_that_can_be_made_html' : 'producable_recipes',
-    '/recv' : 'recv',
-    '/form' : 'form',
     '/convert_all_the_things_form': 'convert_all_the_things_form',
     '/convert_all_the_things_recv' : 'convert_all_the_things_recv',
     '/add_liquor_type_form': 'add_liquor_type_form',
@@ -25,7 +27,11 @@ dispatch = {
     '/add_to_inventory_form': 'add_to_inventory_form',
     '/add_to_inventory_recv': 'add_to_inventory_recv',
     '/add_a_new_recipe_form': 'add_a_new_recipe_form',
-    '/add_a_new_recipe_recv': 'add_a_new_recipe_recv'
+    '/add_a_new_recipe_recv': 'add_a_new_recipe_recv',
+    '/rpc'  : 'dispatch_rpc',
+    '/view_image.html' : 'view_image'
+
+
 }
 
 html_headers = [('Content-type', 'text/html')]
@@ -34,7 +40,9 @@ class SimpleApp(object):
     def __call__(self, environ, start_response):
 
         #load from file
-        generate_html.create_data('bin/sample_database')
+        
+        generate_html.create_data('bin/sample_database') # in bin/run-web now (comment out??)
+
         path = environ['PATH_INFO']
         fn_name = dispatch.get(path, 'error')
 
@@ -194,11 +202,13 @@ class SimpleApp(object):
         return [data]
 
     def add_a_new_recipe_form(self, environ, start_response):
+        print "in add_a_new_recipe_form"
         data = generate_html.add_a_new_recipe_form()
         start_response('200 OK', list(html_headers))
         return [data]
    
     def add_a_new_recipe_recv(self, environ, start_response):
+        print "in add_a_new_recipe_recv"
         formdata = environ['QUERY_STRING']
         results = urlparse.parse_qs(formdata)
 
@@ -234,6 +244,15 @@ class SimpleApp(object):
 """     
         start_response('200 OK', list(html_headers))
         return [data]
+
+    def view_image(self, environ, start_response):
+        content_type = 'image/jpg'
+        pth = os.path.dirname(__file__)
+        filename = pth + '/searchbyspirit.jpg'
+        data = open(filename, 'rb').read()
+        start_response('200 OK', [('Content-Type', content_type)])
+        return [data]
+
     def dispatch_rpc(self, environ, start_response):
         # POST requests deliver input data via a file-like handle,
         # with the size of the data specified by CONTENT_LENGTH;
@@ -280,5 +299,16 @@ class SimpleApp(object):
     def rpc_add(self, a, b):
         return int(a) + int(b)
 
+    def rpc_add_recipe(self, name, ingredients):
+        r = recipes.Recipe(name,ingredients)
+        return db.add_recipe(r)
 
+    def rpc_add_to_inventory(self, mfg,liquor,amt ):
+        return db.add_to_inventory(mfg,liquor,amt)
+
+    def rpc_add_bottle_type(self, mfg, liquor,typ):
+        return db.add_bottle_type(mfg,liquor,typ)
+
+    def rpc_producable_recipes(self):
+        return list(db.recipes_we_can_make())
 

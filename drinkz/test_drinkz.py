@@ -77,7 +77,7 @@ def test_bulk_load_inventory_3():
     assert n == 0, n
 
 
-def test_bulk_load_inventory_3():
+def test_bulk_load_inventory_4():
     db._reset_db()
 
     db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
@@ -89,7 +89,7 @@ Johnnie Walker,Black Label,1000 ml
     n = load_bulk_data.load_inventory(fp)
     assert n == 1, n
 
-def test_bulk_load_inventory_4():
+def test_bulk_load_inventory_5():
     db._reset_db()
 
     db.add_bottle_type('Johnnie Walker', 'Black Label', 'blended scotch')
@@ -190,6 +190,38 @@ Jose Cuervo,Silver,tequila
     n = load_bulk_data.load_bottle_types(fp)
     assert db._check_bottle_type_exists('Johnnie Walker', 'Black Label')
     assert n == 2, n
+
+def test_bulk_load_recipes_1():
+    db._reset_db()
+    data = "tequila shot, 8oz: tequila"
+    fp =StringIO(data)
+    n = load_bulk_data.load_recipes(fp)
+    assert db._check_recipe_exists('tequila shot')
+    assert n == 1, n
+
+def test_bulk_load_recipes_2():
+    db._reset_db()
+    data = "vomit inducing martini,6 oz: orange juice, 1.5 oz: vermouth"
+    fp =StringIO(data)
+    n = load_bulk_data.load_recipes(fp)
+    assert db._check_recipe_exists('vomit inducing martini')
+    assert n == 1, n
+
+def test_bulk_load_recipes_3():
+    db._reset_db()
+    data = """#happy comment, sad comment 
+scotch on the rocks,4 oz: blended scotch
+vodka martini,6 oz: unflavored vodka, 1.5 oz: vermouth
+whiskey bath, 2 liter: blended scotch
+
+#yo, titus how you doing?"""
+
+    fp =StringIO(data)
+    n = load_bulk_data.load_recipes(fp)
+    assert db._check_recipe_exists('scotch on the rocks')
+    assert db._check_recipe_exists('vodka martini')
+    assert db._check_recipe_exists('whiskey bath')
+    assert n == 3, n
 
 def test_script_load_bottle_types_1():
     scriptpath = 'bin/load-liquor-types'

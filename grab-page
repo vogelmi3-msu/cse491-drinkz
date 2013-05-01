@@ -1,5 +1,14 @@
 import socket, sys
-
+######################################################################
+#This script takes 2 command line arguments (host and port)
+#Prints out the result of submitting a GET request
+#
+#Reference:
+#    http://effbot.org/zone/socket-intro.htm
+#    "Example: read a document via HTTP (File:httpget1.py)"
+#How to run:
+#   python grab-page http://arctic.cse.msu.edu  portNumber
+#####################################################################
 def main(args):
     if len(args) < 3:
         print "Usage: ./grab-page url port"

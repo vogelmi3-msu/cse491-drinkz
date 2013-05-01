@@ -1,5 +1,5 @@
 import db
-
+#import the database so we can use it..
 class Recipe:
     def __init__(self, name = '', ingredients = []):
         self.name = name

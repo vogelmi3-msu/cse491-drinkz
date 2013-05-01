@@ -3,9 +3,13 @@ import sys
 import _mypath
 from wsgiref.simple_server import make_server
 
+import urlparse
+import simplejson
+
 from drinkz.app import SimpleApp
 from drinkz import db
-
+from drinkz import generate_html
+from drinkz import recipes
 
 #run run-web from the cse491-drinkz directory NOT BIN
 #filename = "bin/make-test-database"
@@ -13,9 +17,12 @@ from drinkz import db
 
 if __name__ == '__main__':
     import random, socket
-    #port = random.randint(8000, 9999)
-    port = 8638
+    port = random.randint(8000, 9999)
+    #port = 8638
     print port
+
+    #load from file
+    generate_html.create_data('/bin/sample_database')
     
     app = SimpleApp()
     
