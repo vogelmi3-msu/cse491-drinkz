@@ -6,34 +6,39 @@ from cPickle import dump, load
 import recipes as rc
 import sys
 import os.path
+import sqlite
 
+try:
+    os.unlink('tables.db')
+except OSError:
+    pass
+
+db = sqlite3.connect('tables.db')
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# private singleton variables at module level
-_bottle_types_db =set()
-_inventory_db ={}
-_recipe_db = {}
+global c = db.cursor()
+
+def _create_db(filename):
+    # private singleton variables at module level
+    c.execute('CREATE TABLE _bottle_types_db (id INTEGER PRIMARY KEY ASC, manufacturer TEXT, type TEXT, liquor TEXT)')
+    c.execute('CREATE TABLE _inventory_db (id INTEGER PRIMARY KEY ASC, name TEXT, liquor TEXT, amount FLOAT, bottle_type_id INTEGER)')
+    c.execute('CREATE TABLE _recipe_db (id INTEGER PRIMARY KEY ASC, name TEXT, ingredient_list TEXT)')
+    temp_bottle_types_db =set()
+    temp_inventory_db ={}
+    temp_recipe_db = {}
+    fp = open(filename,'rb')
+    loaded = load(fp)
+    (temp_bottle_types_db,temp_inventory_db,temp_recipe_db)=loaded
+    print loaded
 
 def _reset_db():
     "A method only to be used during testing -- toss the existing db info."
-    global _bottle_types_db, _inventory_db, _recipe_db
-    _bottle_types_db =set()
-    _inventory_db = {}
-    _recipe_db = {}
+    c.execute('DELETE FROM _bottle_types_db WHERE 1')
+    c.execute('DELETE FROM _inventory_db WHERE 1')
+    c.execute('DELETE FROM _recipe_db WHERE 1')
 
-def save_db(filename):
-    fp = open(filename, 'wb')
+def load_db():
 
-    tosave = (_bottle_types_db, _inventory_db, _recipe_db)
-    dump(tosave, fp)
-
-    fp.close()
-
-def load_db(filename):
-    global _bottle_types_db, _inventory_db, _recipe_db
-    fp = open(filename, 'rb')
-
-    loaded = load(fp)
     (_bottle_types_db, _inventory_db, _recipe_db) = loaded
 
     fp.close()
@@ -54,18 +59,20 @@ class YourRecipeFormatSucks(Exception):
 
 def add_bottle_type(mfg, liquor, typ):
     "Add the given bottle type into the drinkz database."
-    _bottle_types_db.add((mfg, liquor, typ))
+    c.execute('IF NOT EXISTS( SELECT 1 FROM _bottle_types_db WHERE manufacturer=',mfg,', AND liquor=',liquor,' AND type=',typ,') INSERT INTO _bottle_types_db (manufacturer, liquor, type) VALUES('mfg,',',liquor,',',typ,')')
 
 def _check_bottle_type_exists(mfg, liquor):
-    for (m, l, _) in _bottle_types_db:
-        if mfg == m and liquor == l:
-            return True
+    c.execute('SELECT id FROM _bottle_types_db WHERE manufacturer=',mfg,' AND liquor=',liquor)
+    bottle_type_id =  c.fetchone()[0]
+    if bottle_type_id > 0:
+            return True 
     return False
 
 def _check_recipe_exists(name):
-    for r in _recipe_db:
-        if name == r:
-            return True
+    c.execute('SELECT id FROM _bottle_types_db WHERE name=',name)
+    recipe_id =  c.fetchone()[0]
+    if recipe_id > 0:
+            return True 
     return False
 
 def add_to_inventory(mfg, liquor, amount):
@@ -77,41 +84,38 @@ def add_to_inventory(mfg, liquor, amount):
 
     # check for key in dict, if  present, append list
     try:
-        amt = amount.split()
+        amt = convert_to_ml(amount)
     except (ValueError):
         err = "Invalid input: missing amount"
         raise InvalidInput(err)
-    
-    try:
-        _inventory_db[(mfg,liquor)].append(amount)
-
-    # if not present, add to dict and create list
-    except (KeyError):
-        _inventory_db[(mfg,liquor)]=[amount]
+    oldAmount = c.execute('SELECT amount FROM _inventory_db WHERE manufacturer=',mfg,' AND liquor=',liquor)
+    if oldAmount > 0:
+        c.execute('UPDATE _inventory_db SET amount=',amount+oldAmount)
+    else
+        bottle_type_id = c.execute('SELECT id FROM _bottle_types_db WHERE manufacturer=',mfg,' AND liquor=',liquor)
+        c.execute('INSERT INTO _inventory_db (manufacturer, liquor, amount, id) VALUES('mfg,',',liquor,',',typ,',',bottle_type_id,')')
         
 
 def check_inventory(mfg, liquor):
-    for key in _inventory_db:
-        if mfg == key[0] and liquor == key[1]:
-            return True
+    c.execute('SELECT id FROM _inventory_db WHERE manufacturer=',mfg,'AND liquor=',liquor)
+    liquor_id =  c.fetchone()[0]
+    if liquor_id > 0:
+            return True 
     return False
 
 def check_inventory_for_type(typ):
-    available = []
-    for (m, l, t) in _bottle_types_db:
-        if t == typ:
-            available.append((m,l))
-    return available
-
+    c.execute('SELECT id FROM _inventory_db WHERE type=',typ)
+    liquor_id =  c.fetchone()[0]
+    if liquor_id > 0:
+            return True 
+    return False
 
 
 def get_liquor_amount(mfg, liquor):
     "Retrieve the total amount of any given liquor currently in inventory."
-    amounts = _inventory_db[(mfg, liquor)] 
-    totalVolume = 0.0
-    for bottle in amounts:
-        totalVolume += convert_to_ml(bottle)
-    return totalVolume
+    _inventory_db = c.execute('SELECT amount FROM _inventory_db WHERE manufacturer=',mfg,' AND liquor=',liquor)
+    amount = c.fetchone()[0] 
+    return amount
 
 def convert_to_ml(amount):
     (amt, unit) = amount.split()
@@ -128,10 +132,13 @@ def convert_to_ml(amount):
 
 def get_liquor_inventory():
     "Retrieve all liquor types in inventory, in tuple form: (mfg, liquor)."
-    for key in _inventory_db:
-        yield key[0], key[1]
+    _inventory_db = c.execute('SELECT * FROM _inventory_db')
+    for i in _inventory_db:
+        yield i['manufacturer'], i['liquor']
 
 def add_recipe(r):
+    ingredients = ','.join(r.ingredient_list)
+    c.execute('IF NOT EXISTS( SELECT 1 FROM _recipe_db WHERE name=',r.getName(),') INSERT INTO _recipe_db (name, ingredient_list) VALUES('r.getName(),',',ingredients')')
     key = r.getName()
     value = r
     if (get_recipe(key)):
@@ -141,30 +148,31 @@ def add_recipe(r):
         _recipe_db[key] = value
 
 def get_recipe(name):
-    try:
-        return _recipe_db[name]
-    except(KeyError):
-        pass
+    c.execute('SELECT ingredient_list FROM _recipe_db WHERE name=',name)
+    ingredients =  c.fetchone()[0]
+    if ingredients:
+            return Recipe(name,ingredients.split(',')
+    return False
 
 def get_all_recipes():
-    return _recipe_db.values()
+    c.execute('SELECT * FROM _recipe_db')
+    return c.fetchall()
 
 def get_inventory():
-    return _inventory_db
+    c.execute('SELECT * FROM _inventory_db')
+    return  c.fetchall()
 
 def recipes_we_can_make():
     recipes_we_can_make_list = []
-    for name in _recipe_db:
-        recipe = _recipe_db[name]
+    _recipe_db = get_all_recipes()
+    for recipe in _recipe_db:
         ingredient_list = recipe.getIngredients()
         all_ingred = []
-        for (typ,amt) in ingredient_list:
-            
+        for (typ,amt) in ingredient_list:    
             avail = check_inventory_for_type(typ)
             avail_amt = 0
             for (m,l) in avail:
                 avail_amt += get_liquor_amount(m,l)
-            
             if avail_amt > convert_to_ml(amt):
                 all_ingred.append(avail_amt)
         if len(all_ingred) == len(ingredient_list):
